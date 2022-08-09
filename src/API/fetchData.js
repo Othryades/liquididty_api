@@ -4,7 +4,7 @@ export const fetchData = async (param) => {
     try {
         const request = await axios.get(`https://swapi.dev/api/${param.endPoint}`, {
             params: {
-                search: param.param,
+                search: param.search,
             },
         });
 

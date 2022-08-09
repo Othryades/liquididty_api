@@ -45,7 +45,6 @@ export default new Vuex.Store({
             if (obj.endPoint === "films") {
                 context.commit("saveFilmsData", response.data);
             } else if (obj.endPoint === "planets") context.commit("savePlanetsData", response.data);
-            return response.data;
         },
     },
 });

@@ -20,7 +20,7 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar app dark shrink-on-scroll src="./assets/Untitled.png" height="250" elevation="12">
+        <v-app-bar app dark shrink-on-scroll src="./assets/vader.png" height="255" elevation="12">
             <template v-slot:img="{ props }">
                 <v-img v-bind="props"></v-img>
             </template>
@@ -31,7 +31,9 @@
         </v-app-bar>
 
         <v-main>
-            <router-view></router-view>
+            <transition name="slide" mode="out-in">
+                <router-view></router-view>
+            </transition>
         </v-main>
     </v-app>
 </template>
@@ -49,3 +51,14 @@ export default {
     },
 };
 </script>
+<style>
+.slide-enter-active,
+.slide-leave-active {
+    transition: opacity 0.5s, transform 0.5s;
+}
+.slide-enter,
+.slide-leave-to {
+    opacity: 0;
+    transform: translateX(-30%);
+}
+</style>

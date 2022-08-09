@@ -23,7 +23,7 @@
             <v-row no-gutters class="justify-center">
                 <v-col class="col-md-8">
                     <v-list v-if="userInput.length > 0" dense color="grey lighten-4" class="elevation-2">
-                        <template v-if="state.people">
+                        <template v-if="localState.showPeople">
                             <v-subheader>Characters</v-subheader>
                             <v-list-item-group color="primary">
                                 <v-list-item v-for="(item, i) in getCharactersList.slice(0, 3)" :key="i">
@@ -38,7 +38,7 @@
                                 >
                             </v-list-item-group>
                         </template>
-                        <template v-if="state.films">
+                        <template v-if="localState.showFilms">
                             <v-subheader>Films</v-subheader>
                             <v-list-item-group color="primary">
                                 <v-list-item v-for="(item, i) in getFilms.slice(0, 3)" :key="i">
@@ -53,7 +53,7 @@
                                 >
                             </v-list-item-group>
                         </template>
-                        <template v-if="state.planets">
+                        <template v-if="localState.showPlanets">
                             <v-subheader>Planets</v-subheader>
                             <v-list-item-group color="primary">
                                 <v-list-item v-for="(item, i) in getPlanets.slice(0, 3)" :key="i">
@@ -84,52 +84,58 @@ export default {
     data() {
         return {
             userInput: "",
-            state: {
-                people: false,
-                films: false,
-                planets: false,
+            localState: {
+                showPeople: false,
+                showFilms: false,
+                showPlanets: false,
             },
         };
+    },
+    computed: {
+        ...mapGetters("characters", ["getCharactersList"]),
+        ...mapGetters(["getFilms", "getPlanets"]),
     },
     methods: {
         ...mapActions("characters", ["fetchCharactersData"]),
         ...mapActions(["fetchData"]),
 
         async requestPeople() {
-            const response = await this.fetchCharactersData({
+            await this.fetchCharactersData({
                 endPoint: "people",
-                param: this.userInput,
+                search: this.userInput,
             });
-            if (response.results.length > 0) {
-                this.state.people = true;
+
+            if (this.getCharactersList.length > 0) {
+                this.localState.showPeople = true;
             } else {
-                this.state.people = false;
+                this.localState.showPeople = false;
             }
         },
         async requestFilms() {
-            const response = await this.fetchData({
-                endPoint: "films",
-                param: this.userInput,
-            });
-            if (response.results.length > 0) {
-                this.state.films = true;
+            await this.callApi("films");
+
+            if (this.getFilms.length > 0) {
+                this.localState.showFilms = true;
             } else {
-                this.state.films = false;
+                this.localState.showFilms = false;
             }
         },
         async requestPlanets() {
-            const response = await this.fetchData({
-                endPoint: "planets",
-                param: this.userInput,
-            });
-            if (response.results.length > 0) {
-                this.state.planets = true;
+            await this.callApi("planets");
+            if (this.getPlanets.length > 0) {
+                this.localState.showPlanets = true;
             } else {
-                this.state.planets = false;
+                this.localState.showPlanets = false;
             }
         },
+        async callApi(endPoint) {
+            await this.fetchData({
+                endPoint,
+                search: this.userInput,
+            });
+        },
         searchInput: debounce(async function (e) {
-            const values = await Promise.all([this.requestPeople(), this.requestFilms(), this.requestPlanets()]);
+            await Promise.all([this.requestPeople(), this.requestFilms(), this.requestPlanets()]);
         }, 200),
         handleSeeAll(path) {
             this.$root.$router.push({
@@ -137,10 +143,6 @@ export default {
                 query: { search: this.userInput },
             });
         },
-    },
-    computed: {
-        ...mapGetters("characters", ["getCharactersList"]),
-        ...mapGetters(["getFilms", "getPlanets"]),
     },
 };
 </script>
