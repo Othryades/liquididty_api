@@ -1,4 +1,4 @@
-# Liquididty task
+# Liquididty
 
 ## Project setup
 
